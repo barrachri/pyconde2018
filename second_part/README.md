@@ -2,7 +2,7 @@
 
 ## Agenda
 
-    1. Build a Python producer & consumer (API=>REDIS=>REDIS=>SCYLLA)
+    1. Build a Python producer & consumer (PRODUCER=>REDIS=>CONSUMER=>SCYLLA)
     2. Use Airflow to move things around
         1. Get things from Scylla and move them to parquet inside minio
     3. Use Airflow to train machine learning models

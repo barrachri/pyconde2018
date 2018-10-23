@@ -1,27 +1,8 @@
-
-scylladb
-
-airflow
-
-consumer
-
-faker
-  produce random data for the consumer (like IOT)
-
-minio
-
 version: '3'
 services:
-    # db for airflow
-    postgres:
-        image: postgres:10.0
-        environment:
-            - POSTGRES_USER=airflow
-            - POSTGRES_PASSWORD=airflow
-            - POSTGRES_DB=airflow
-
     airflow:
-        image: barrachri/easy-airflow:1.10.0
+        build:
+            context: ./airflow
         restart: always
         depends_on:
             - postgres
@@ -33,10 +14,9 @@ services:
             - POSTGRES_PORT=5432
             - AIRFLOW__CORE__EXECUTOR=LocalExecutor
             - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-            - AIRFLOW__CORE__FERNET_KEY=E7W_AV9Z2itMs4MdNjhek3avY-i14dig56eG8LdUPEM=
 
         volumes:
-            - ./dags:/usr/local/airflow/dags
+            - ./airflow/src/dags:/usr/local/airflow/dags
         ports:
             - "8080:8080"
         command: webserver
@@ -46,20 +26,35 @@ services:
             timeout: 30s
             retries: 3
 
-  # our streams
-  redis:
-    image: redis:5.0-rc
-    ports:
-      - "6379:6379"
+    # db for airflow
+    postgres:
+        image: postgres:10.0
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
 
-  # our storage
-  scylladb:
-    image: scylladb/scylla:2.3.0
-    ports:
-      - "9042:9042"
+    # our streams
+    redis:
+        image: redis:5-alpine
+        ports:
+        - "6379:6379"
 
-  # our storage
-  minio:
-    image: minio/minio:latest
-    ports:
-      - "9042:9042"
+    # our storage
+    scylladb:
+        image: scylladb/scylla:2.3.0
+        ports:
+            - "9042:9042"
+
+    # our storage
+    minio:
+        image: minio/minio:latest
+        environment:
+            MINIO_ACCESS_KEY: 123456789
+            MINIO_SECRET_KEY: 123456789
+        volumes:
+            - ./minio:/export
+        ports:
+             - "9000:9000"
+        command: server /export
+

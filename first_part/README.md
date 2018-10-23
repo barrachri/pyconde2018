@@ -8,8 +8,5 @@
 4. Kafka? I'd rather use Redis
 5. Short term storage VS Long term storage
 6. Airflow
-7. mlflow
 
 30-45 mins talks
-
-Schema,
