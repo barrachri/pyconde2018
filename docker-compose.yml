@@ -1,8 +1,7 @@
 version: '3'
 services:
     airflow:
-        build:
-            context: ./airflow
+        image: barrachri/pyconde2018_airflow:latest
         restart: always
         depends_on:
             - postgres
