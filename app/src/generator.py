@@ -10,7 +10,7 @@ import config_logging
 
 log = logging.getLogger(__name__)
 
-URI = "http://localhost:8080"
+URI = "http://localhost:8888"
 
 # devices id
 DEVICES = [

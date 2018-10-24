@@ -45,4 +45,4 @@ if __name__ == "__main__":
     app.on_startup.append(start_redis_connection)
     app.on_cleanup.append(stop_redis_connection)
 
-    web.run_app(app)
+    web.run_app(app, port=8888)
