@@ -1,9 +1,11 @@
 """
 A simple dag to read from ScyllaDB
 """
-from airflow import DAG
-from airflow.operators.bash_operator import PythonOperator
+import logging
 from datetime import datetime, timedelta
+
+from airflow import DAG
+from airflow.operators.python_operator import PythonOperator
 
 from cassandra.cluster import Cluster
 import pandas as pd
@@ -25,37 +27,16 @@ dag = DAG(
     'create_model', default_args=default_args, schedule_interval=timedelta(1))
 
 
-def print_context(ds, **kwargs):
+def retrieve_data(ds, **kwargs):
     cluster = Cluster()
     session = cluster.connect('devices')
-    rows = session.execute('SELECT deviceid, timestamp, data FROM devices ORDER BY timestamp DESC;')
+    rows = session.execute('SELECT deviceid, timestamp, data FROM devices;')
+
     for device in rows:
-        print(device.deviceid, device.timestamp, device.data)
-
-    df = pd.DataFrame.from_dict(rows)
-
-    # Initialize minioClient with an endpoint and access/secret keys.
-    minioClient = Minio('minio:9000',
-                        access_key='123456789',
-                        secret_key='123456789',
-                        secure=True)
-
-    try:
-        minioClient.make_bucket("data", location="us-east-1")
-    except BucketAlreadyExists as err:
-        pass
-    except ResponseError as err:
-        raise
-    else:
-        try:
-            minioClient.put_object('data', 'pumaserver_debug.log', '/tmp/pumaserver_debug.log')
-        except ResponseError as err:
-            print(err)
-    return 'Whatever you return gets printed in the logs'
-
+        logging.info(device.deviceid, device.timestamp, device.data)
 
 run_this = PythonOperator(
-    task_id='print_the_context',
+    task_id='retrieve_data',
     provide_context=True,
-    python_callable=print_context,
+    python_callable=retrieve_data,
     dag=dag)
