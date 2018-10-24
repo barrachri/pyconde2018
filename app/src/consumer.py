@@ -27,6 +27,9 @@ async def main(session):
     if last_id:
         log.info(f"Starting consuming messages from {last_id}")
         last_id = [last_id]
+    else:
+        log.info(f"Starting consuming messages from the beginning")
+        last_id = [0]
 
     streams = redis.streams.consumer([STREAM], latest_ids=last_id, encoding="utf-8")
 

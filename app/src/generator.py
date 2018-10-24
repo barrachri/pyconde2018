@@ -1,5 +1,4 @@
 import asyncio
-from uuid import uuid4
 import random
 import time
 import logging
